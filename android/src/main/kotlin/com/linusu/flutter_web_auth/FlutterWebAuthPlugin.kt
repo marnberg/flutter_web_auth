@@ -1,5 +1,6 @@
 package com.linusu.flutter_web_auth
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -41,7 +42,14 @@ class FlutterWebAuthPlugin(private val context: Context): MethodCallHandler {
           }
           intent.intent.putExtra("android.support.customtabs.extra.KEEP_ALIVE", keepAliveIntent)
 
-          intent.launchUrl(context, url)
+          intent.intent.setPackage("com.android.chrome")
+
+          try {
+            intent.launchUrl(context, url)
+          } catch (ex: ActivityNotFoundException) {
+            intent.intent.setPackage(null)
+            intent.launchUrl(context, url)
+          }
         }
         "cleanUpDanglingCalls" -> {
           callbacks.forEach{ (_, danglingResultCallback) ->
